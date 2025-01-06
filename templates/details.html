@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Game Details</title>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+    />
+    <style>
+        body {
+            background-color: #1d428a;
+            color: #ffffff;
+            font-family: 'Roboto', sans-serif;
+        }
+        .details-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .game-score {
+            font-size: 20px;
+            color: #f1c40f;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .team-logo {
+            width: 50px;
+            height: 50px;
+        }
+        .player-card {
+            background-color: #2b2b2b;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+        .player-card-header {
+            background-color: #333333;
+            border-bottom: 1px solid #444444;
+            padding: 15px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .player-card-body {
+            padding: 15px;
+        }
+        .performance-score {
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .performance-score.text-success {
+            color: #2ecc71;
+        }
+        .performance-score.text-warning {
+            color: #f1c40f;
+        }
+        .performance-score.text-danger {
+            color: #e74c3c;
+        }
+        .sentiment-score {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        /* 
+            We'll define .text-neutral specifically so it doesn't blend 
+            into the background as .text-muted sometimes can 
+        */
+        .text-neutral {
+            color: #3498db !important; /* Vibrant "info"-like blue */
+        }
+        .comments-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .comments-list li {
+            background-color: #444444;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .no-comments {
+            font-style: italic;
+            color: #95a5a6;
+        }
+        .back-button {
+            margin-bottom: 20px;
+        }
+        .stat-table {
+            width: 100%;
+        }
+        .stat-table td {
+            padding: 5px 10px;
+        }
+        .stat-table td:first-child {
+            font-weight: bold;
+        }
+        .team-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .vs-text {
+            font-size: 24px;
+            margin: 0 20px;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container details-container">
+        <!-- Back Button -->
+        <div class="back-button">
+            <a href="{{ url_for('home', date=date) }}" class="btn btn-secondary">← Back to Games</a>
+        </div>
+
+        <!-- Game Details Section -->
+        <h1>Game Details</h1>
+        <div class="team-logos">
+            <div class="text-center">
+                <img
+                  src="{{ url_for('static', filename='logos/' + game['away_team']|slugify + '.svg') }}"
+                  alt="{{ game['away_team'] }}"
+                  class="team-logo"
+                />
+                <p>{{ game['away_team'] }}</p>
+            </div>
+            <div class="vs-text">vs</div>
+            <div class="text-center">
+                <img
+                  src="{{ url_for('static', filename='logos/' + game['home_team']|slugify + '.svg') }}"
+                  alt="{{ game['home_team'] }}"
+                  class="team-logo"
+                />
+                <p>{{ game['home_team'] }}</p>
+            </div>
+        </div>
+        <p class="game-score">Score: {{ game['score'] }}</p>
+        <p class="text-center">Status: {{ game['status'] }}</p>
+
+        <!-- Player Performance Section -->
+        <h2>Player Performances</h2>
+        {% for player in players %}
+        <div class="card player-card">
+            <!-- Player Header -->
+            <div class="player-card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="card-title">{{ player['name'] }} ({{ player['team'] }})</h3>
+                    <p class="mb-0">
+                        Rank: {{ loop.index }}
+                    </p>
+                </div>
+                <div class="text-end">
+                    <p class="performance-score
+                        {% if player['performance_score']|float > 9.0 %}
+                            text-success
+                        {% elif player['performance_score']|float > 5.0 %}
+                            text-warning
+                        {% else %}
+                            text-danger
+                        {% endif %}
+                    ">
+                        Score: {{ player['performance_score'] }}
+                    </p>
+                </div>
+            </div>
+            <!-- Player Body -->
+            <div class="player-card-body row">
+                <!-- Stats Section -->
+                <div class="col-md-4">
+                    <table class="stat-table">
+                        <tr>
+                            <td>Points:</td>
+                            <td>{{ player['points'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Rebounds:</td>
+                            <td>{{ player['rebounds'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Assists:</td>
+                            <td>{{ player['assists'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Steals:</td>
+                            <td>{{ player['steals'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Blocks:</td>
+                            <td>{{ player['blocks'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Turnovers:</td>
+                            <td>{{ player['turnovers'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>FGM/FGA:</td>
+                            <td>{{ player['fg_made'] }}/{{ player['fg_attempts'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>FTM/FTA:</td>
+                            <td>{{ player['ft_made'] }}/{{ player['ft_attempts'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>FG%:</td>
+                            <td>{{ player['fg_pct'] }}%</td>
+                        </tr>
+                        <tr>
+                            <td>FT%:</td>
+                            <td>{{ player['ft_pct'] }}%</td>
+                        </tr>
+                        <tr>
+                            <td>Minutes:</td>
+                            <td>{{ player['minutes'] }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Comments Section -->
+                <div class="col-md-8">
+                    <h4 class="card-title">Fan Reactions</h4>
+                    {% set sentiment_value = player['average_sentiment'] %}
+                    {% if sentiment_value is string %}
+                        <!-- Means it's 'N/A' -->
+                        <p class="sentiment-score text-neutral">Sentiment Score: N/A</p>
+                    {% else %}
+                        <p class="sentiment-score
+                            {% if sentiment_value > 0.2 %}
+                                text-success
+                            {% elif sentiment_value < -0.2 %}
+                                text-danger
+                            {% else %}
+                                text-neutral
+                            {% endif %}
+                        ">
+                            Sentiment Score: {{ sentiment_value }}
+                        </p>
+                    {% endif %}
+
+                    {% if player['top_comments'] %}
+                    <ul class="comments-list">
+                        {% for comment in player['top_comments'] %}
+                        <li>{{ comment }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="no-comments">No comments found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

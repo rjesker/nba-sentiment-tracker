@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>NBA Games</title>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+    />
+    <!-- Flatpickr CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <style>
+        body {
+            background-color: #1d428a; /* Dark navy */
+            color: #ffffff;
+            font-family: 'Roboto', sans-serif;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .date-picker-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .date-picker-container input {
+            height: 36px;
+            text-align: center;
+            max-width: 200px;
+        }
+        .date-picker-container button {
+            height: 36px;
+        }
+        .games-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .game-card {
+            background-color: #2b2b2b; /* Darker gray for contrast */
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: #ffffff;
+            transition: background-color 0.3s;
+        }
+        .game-card:hover {
+            background-color: #333333;
+        }
+        .team-logo {
+            width: 50px;
+            height: 50px;
+        }
+        .status.final {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .status.upcoming {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+        .status.in-progress {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .game-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .game-link.disabled {
+            pointer-events: none;
+            color: #7f8c8d;
+        }
+        .vs-text {
+            font-size: 18px;
+            margin: 0 10px;
+            color: #ffffff;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .status {
+            font-size: 16px;
+        }
+        /* Optional: Add a subtle box-shadow on hover */
+        .game-card:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <h1>NBA Games</h1>
+    <div class="games-container">
+        <!-- Date Picker Form -->
+        <form action="/" method="get" class="date-picker-container">
+            <label for="date-picker" class="me-2 fw-bold">Games for:</label>
+            <input
+              type="text"
+              name="date"
+              id="date-picker"
+              class="form-control"
+              placeholder="Select a date"
+              value="{{ date }}"
+            />
+            <button type="submit" class="btn btn-primary ms-2">Go</button>
+        </form>
+
+        <!-- Navigation Buttons for Dates -->
+        <div class="navigation-buttons">
+            <a
+              href="/?date={{ (datetime.strptime(date, '%Y-%m-%d') - timedelta(days=1)).strftime('%Y-%m-%d') }}"
+              class="btn btn-secondary"
+            >Previous</a>
+            <a
+              href="/?date={{ (datetime.strptime(date, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d') }}"
+              class="btn btn-secondary"
+            >Next</a>
+        </div>
+
+        <!-- List of Games -->
+        {% if games %}
+        <div class="row">
+            {% for game in games %}
+            <div class="col-md-6">
+                <div class="card game-card">
+                    {% if game['clickable'] %}
+                    <a
+                      href="{{ url_for('game_details', game_id=game['game_id']) }}"
+                      class="game-link"
+                    >
+                    {% else %}
+                    <span class="game-link disabled">
+                    {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <!-- Away Team Logo -->
+                                <div class="me-3 text-center">
+                                    <img
+                                      src="{{ url_for('static', filename='logos/' + game['away_team']|slugify + '.svg') }}"
+                                      alt="{{ game['away_team'] }}"
+                                      class="team-logo"
+                                    />
+                                    <p class="mb-0">{{ game['away_team'] }}</p>
+                                </div>
+                                <!-- Versus Text -->
+                                <div class="vs-text">vs</div>
+                                <!-- Home Team Logo -->
+                                <div class="me-3 text-center">
+                                    <img
+                                      src="{{ url_for('static', filename='logos/' + game['home_team']|slugify + '.svg') }}"
+                                      alt="{{ game['home_team'] }}"
+                                      class="team-logo"
+                                    />
+                                    <p class="mb-0">{{ game['home_team'] }}</p>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <p class="mb-0 status
+                                    {% if 'Final' in game['status'] %}
+                                        final
+                                    {% elif 'ET' in game['status'] or 'Scheduled' in game['status'] %}
+                                        upcoming
+                                    {% else %}
+                                        in-progress
+                                    {% endif %}
+                                ">
+                                    {{ game['status'] }}
+                                </p>
+                            </div>
+                        </div>
+                    {% if game['clickable'] %}
+                    </a>
+                    {% else %}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center mt-5">No games scheduled for this date.</p>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // Initialize Flatpickr
+        flatpickr("#date-picker", {
+            dateFormat: "Y-m-d",
+            defaultDate: "{{ date }}"
+        });
+    </script>
+</body>
+</html>
