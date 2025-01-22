@@ -55,6 +55,18 @@
     python app.py
     ```
 
+## Screenshots
+
+### Home Page
+List of games with team logos and scores.
+
+![Home Page](screenshots/Screenshot_home.png)
+
+### Game Details
+Detailed player stats and fan sentiment analysis for a specific game.
+
+![Game Details](screenshots/Screenshot_details.png)
+
 
 
 
