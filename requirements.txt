@@ -1,0 +1,6 @@
+Flask==2.3.2
+nba_api==1.1.11
+praw==7.7.0
+vaderSentiment==3.3.2
+isodate==0.6.1
+pytz==2023.3
