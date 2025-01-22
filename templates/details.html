@@ -143,7 +143,7 @@
 
         <!-- Player Performance Section -->
         <h2>Player Performances</h2>
-        {% for player in players %}
+        {% for player in players if player['performance_score'] != 0 %}
         <div class="card player-card">
             <!-- Player Header -->
             <div class="player-card-header d-flex justify-content-between align-items-center">
