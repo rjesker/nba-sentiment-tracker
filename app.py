@@ -24,9 +24,9 @@ app.jinja_env.filters['slugify'] = slugify
 
 # Configure your Reddit credentials here
 reddit = praw.Reddit(
-    client_id="hvEaR2ZB0YcgERqdWuZyBw",            # Replace with your Reddit app's client ID
-    client_secret="CYKgXBCPR-zd9LmYEfFou6vGOEh8Kg",    # Replace with your Reddit app's secret
-    user_agent="nba_tracker by /u/resker2"  # Replace with your Reddit username
+    client_id="your-client-id",
+    client_secret="your-client-secret",
+    user_agent="nba_tracker by /u/your-username"
 )
 
 def is_game_thread(title, home_team, away_team):
